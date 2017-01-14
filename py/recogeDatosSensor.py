@@ -21,8 +21,7 @@ from bluepy.btle import UUID, Peripheral, BTLEException
 def TI_UUID(val):
     return UUID("%08X-0451-4000-b000-000000000000" % (0xF0000000 + val))
 
-
-def obtener_datos_sensor(nombre, tiempo, mac):
+def obtener_datos_sensor(nombre, tiempo, mac, archivos):
     logging.basicConfig(level=logging.INFO, format='%(levelname)-6s %(asctime)-18s %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
 
     config_uuid = TI_UUID(0xAA82)
@@ -62,6 +61,7 @@ def obtener_datos_sensor(nombre, tiempo, mac):
 
         try:
             # print "Info, connected and turning sensor on!"
+            print("Nombre: %s" %nombre)
             logging.info("Connected and turning sensor ON!")
             ch = p.getCharacteristics(uuid=config_uuid)[0]
             ch.write(sensorOn, withResponse=True)
@@ -72,9 +72,7 @@ def obtener_datos_sensor(nombre, tiempo, mac):
 
 
             #GESTION DE DATOS CON PANDAS##########################################################################################
-
             datos = pd.DataFrame(columns=['timestamp', 'gyro-alpha', 'gyro-beta', 'gyro-gamma', 'accel-x', 'accel-y', 'accel-z'])
-
             ######################################################################################################################
 
             print("timestamp;gyro-alpha;gyro-beta;gyro-gamma;accel-x;accel-y;accel-z")
@@ -111,16 +109,18 @@ def obtener_datos_sensor(nombre, tiempo, mac):
                 datos.loc[i] = ['{0:13.0f}'.format(timestamp), gyroX/scale_gyro, gyroY/scale_gyro, gyroZ/scale_gyro, accX/scale_accel, accY/scale_accel, accZ/scale_accel]
                 print (timestamp - tiempo_inicio)
                 print ("Vuelta: ", i)
-                if((timestamp - tiempo_inicio ) > tiempo * 1000): #Pasamos tiempo a ms
+                print ("Numero archivos creados: ", num_archivo)
+                print ("Archivos crear: ", archivos)
+                if((timestamp - tiempo_inicio ) > ((int(tiempo) * 1000))): #Pasamos tiempo a ms
                     num_archivo = num_archivo + 1
-                    datos.to_csv("prueba%d.csv" %num_archivo, ';')
+                    datos.to_csv("%s-%d.csv" %(nombre, num_archivo), ';')
                     tiempo_inicio = round((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds()* 1000)
                     datos = pd.DataFrame(columns=['timestamp', 'gyro-alpha', 'gyro-beta', 'gyro-gamma', 'accel-x', 'accel-y', 'accel-z'])
-                    if(num_archivo == 4): #De momento si hemos llegado a completar cuatro archivos, paramos -> se cambiará en el futuro
-                        break;  
 
+                    if(num_archivo == int(archivos)):
+                        break;
+                        
             # print "Info, turning sensor off!"
-            datos.to_csv("prueba.csv", ';', index=True)
             logging.info("Turning sensor OFF")
             ch = p.getCharacteristics(uuid=config_uuid)[0]
             ch.write(sensorOff, withResponse=True)
@@ -149,6 +149,7 @@ if __name__ == "__main__":
                         help="Nombre del usuario")
     parser.add_argument("-t", "--t", help="Tiempo en cada uno de los ficheros. Por defecto, 30s",
                     default=30)
+    parser.add_argument("-f", "--f", help="Numero de ficheros que se van a generar", default=5)
     args = parser.parse_args()
 
-    obtener_datos_sensor(args.n, args.t, args.m)
+    obtener_datos_sensor(args.n, args.t, args.m, args.f)
