@@ -113,7 +113,7 @@ def obtener_datos_sensor(nombre, tiempo, mac, archivos):
                 print ("Archivos crear: ", archivos)
                 if((timestamp - tiempo_inicio ) > ((int(tiempo) * 1000))): #Pasamos tiempo a ms
                     num_archivo = num_archivo + 1
-                    datos.to_csv("%s-%d.csv" %(nombre, num_archivo), ';')
+                    datos.to_csv("%s-%d.csv" %(nombre, num_archivo), ';', index=False)
                     tiempo_inicio = round((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds()* 1000)
                     datos = pd.DataFrame(columns=['timestamp', 'gyro-alpha', 'gyro-beta', 'gyro-gamma', 'accel-x', 'accel-y', 'accel-z'])
 

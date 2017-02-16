@@ -13,6 +13,19 @@ Interface en Python para dispositivos BLE (Bluetooth Low Energy) sobre Linux.
 ##### Sensor SimpleLink SensorTag CC2650
 [Información del Sensor TI](http://www.ti.com/sensortag).
 
+#### USAR EL SENSOR PARA LA RECOGIDA DE DATOS CON EL SCRIPT recogeDatosSensor.py  
+
+Para usar este script ejecutamos este comando de ejemplo:
+    $ python recogeDatosSensor.py XX:XX:XX:XX:XX:XX Veronica -t 30 -f 1
+
+    El primer parámetro es el nombre que tendrá los archivos.
+    (OPCIONAL) El segundo parámetro es el número de segundos que tendrá los archivos, en cuanto a registros. Por defecto son 30 segundos.
+    (OPCIONAL) El tercer parámetro indica el número de archivos que queremos obtener. Por defecto son 5 archivos.
+
+
+
+
+
 Probad el Tag
 -------------
 Desde vuestro móvil o tablet bajaros la app:
