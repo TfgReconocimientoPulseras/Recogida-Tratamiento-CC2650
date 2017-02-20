@@ -14,6 +14,7 @@ import time
 import datetime
 import pandas as pd
 import argparse
+import ProcesarDatos
 
 
 from bluepy.btle import UUID, Peripheral, BTLEException
@@ -21,11 +22,12 @@ from bluepy.btle import UUID, Peripheral, BTLEException
 def TI_UUID(val):
     return UUID("%08X-0451-4000-b000-000000000000" % (0xF0000000 + val))
 
-def obtener_datos_sensor(nombre, tiempo, mac, archivos):
+def obtener_datos_sensor(nombre, tiempo, mac, archivos, actividad):
     logging.basicConfig(level=logging.INFO, format='%(levelname)-6s %(asctime)-18s %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
 
     config_uuid = TI_UUID(0xAA82)
     data_uuid = TI_UUID(0xAA81)
+    nombre_actividad = ""
 
     # Bit settings to turn on individual movement sensors
     # bits 0 - 2: Gyro x, y z
@@ -75,6 +77,18 @@ def obtener_datos_sensor(nombre, tiempo, mac, archivos):
             datos = pd.DataFrame(columns=['timestamp', 'gyro-alpha', 'gyro-beta', 'gyro-gamma', 'accel-x', 'accel-y', 'accel-z'])
             ######################################################################################################################
 
+            #GESTION DEL TIPO DE LA ACTIVIDAD SEGUN EL VALOR DEL PARAMETRO RECIBIDO actividad#####################################
+            if int(actividad) == 1:
+                nombre_actividad = "ANDAR"
+            elif int(actividad) == 2:
+                nombre_actividad = "TROTAR"
+            elif int(actividad) == 3:
+                nombre_actividad = "BARRER"
+            else:
+                print("Actividad no registrada en el sistema")
+                quit()
+            ######################################################################################################################
+
             print("timestamp;gyro-alpha;gyro-beta;gyro-gamma;accel-x;accel-y;accel-z")
             tiempo_inicio = round((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds()* 1000)
             num_archivo = 0
@@ -113,7 +127,7 @@ def obtener_datos_sensor(nombre, tiempo, mac, archivos):
                 print ("Archivos crear: ", archivos)
                 if((timestamp - tiempo_inicio ) > ((int(tiempo) * 1000))): #Pasamos tiempo a ms
                     num_archivo = num_archivo + 1
-                    datos.to_csv("%s-%d.csv" %(nombre, num_archivo), ';', index=False)
+                    datos.to_csv("Datos/%s-%s-%d.csv" %(nombre, nombre_actividad, num_archivo), ';', index=False)
                     tiempo_inicio = round((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds()* 1000)
                     datos = pd.DataFrame(columns=['timestamp', 'gyro-alpha', 'gyro-beta', 'gyro-gamma', 'accel-x', 'accel-y', 'accel-z'])
 
@@ -124,6 +138,8 @@ def obtener_datos_sensor(nombre, tiempo, mac, archivos):
             logging.info("Turning sensor OFF")
             ch = p.getCharacteristics(uuid=config_uuid)[0]
             ch.write(sensorOff, withResponse=True)
+
+            ProcesarDatos.getStatisticsValues(('%s-%s' %(nombre, nombre_actividad)), int(archivos))
 
         except:
             # print "Fatal, unexpected error!"
@@ -147,9 +163,11 @@ if __name__ == "__main__":
                         help="MAC del dispositivo")
     parser.add_argument("n",
                         help="Nombre del usuario")
+    parser.add_argument("a",
+                        help="Actividad a realizar")
     parser.add_argument("-t", "--t", help="Tiempo en cada uno de los ficheros. Por defecto, 30s",
                     default=30)
-    parser.add_argument("-f", "--f", help="Numero de ficheros que se van a generar", default=5)
+    parser.add_argument("-f", "--f", help="Numero de ficheros que se van a generar", default=1)
     args = parser.parse_args()
 
-    obtener_datos_sensor(args.n, args.t, args.m, args.f)
+    obtener_datos_sensor(args.n, args.t, args.m, args.f, args.a)

@@ -1,7 +1,10 @@
 import pandas as pd
 import argparse
+import time
+import datetime
 
-def getStatisticsValues(nombre, numeroFicheros,time=1, overlap=500):
+
+def getStatisticsValues(nombre, numeroFicheros, time=1, overlap=500):
     dfOut = pd.DataFrame()
     
     dfRollingMean = pd.DataFrame(columns=['avg_gyro-alpha', 'avg_gyro-beta', 'avg_gyro-gamma', 'avg_ax', 'avg_ay', 'avg_az']);
@@ -14,7 +17,7 @@ def getStatisticsValues(nombre, numeroFicheros,time=1, overlap=500):
     dfOut = dfOut.T    
     
     for i in range(0, numeroFicheros):
-        df = pd.read_csv("%s-%d.csv" %(nombre, i+1), sep=';', index_col=0, error_bad_lines=False)
+        df = pd.read_csv("Datos/%s-%d.csv" %(nombre, i+1), sep=';', index_col=0, error_bad_lines=False)
         dfConjunta = pd.DataFrame();
         df.index = pd.to_datetime(df.index.values, unit='ms')
         
@@ -34,8 +37,9 @@ def getStatisticsValues(nombre, numeroFicheros,time=1, overlap=500):
         dfConjunta = dfConjunta.T
         dfOut = pd.concat([dfOut, dfConjunta])
         
-    
-    dfOut.to_csv("%s-procesado.csv" %(nombre), ';')
+    fecha = datetime.datetime.utcnow()
+
+    dfOut.to_csv("DatosProcesados/%s-procesado-%s.csv" %(nombre, fecha), ';')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract features from inputFile and save them in outputFile')
