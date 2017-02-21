@@ -8,6 +8,8 @@ import pandas as pd
 import os.path 
 from os import walk
 def numeroActividad(actividad):
+    numero = 0
+
     if(actividad=="ANDAR"):
         numero=1
     elif(actividad=="TROTAR"):
@@ -32,7 +34,7 @@ def juntar():
             actividad=i.split('-')
             actividad=actividad[1]
             
-            os.chdir(directorioActual+"\DatosProcesados")
+            os.chdir(directorioActual+"/DatosProcesados")
             dfX=pd.DataFrame()
             dfX = pd.read_csv(i, sep=';', index_col=0, error_bad_lines=False)
            
@@ -46,15 +48,15 @@ def juntar():
            
            
             i=0
-            for i in range(numeroFilas+1):
+            for i in range(numeroFilas):
                 lista.append(numero)
             dfY=pd.DataFrame(lista)
           
             dfOutX = pd.concat([dfOutX, dfX])
             dfOutY = pd.concat([dfOutY, dfY])
      os.chdir(directorioActual)
-     dfOutX.to_csv("X_train.csv",header=None )
-     dfOutY.to_csv("y_train.csv",header=None )
+     dfOutX.to_csv("X_train.csv",header=None, index=False)
+     dfOutY.to_csv("y_train.csv",header=None, index=False)
             
 if __name__ == "__main__":
     juntar()
