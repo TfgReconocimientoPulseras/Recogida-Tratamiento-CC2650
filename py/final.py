@@ -28,21 +28,33 @@ def juntar():
      
      for (path, ficheros, archivos) in walk("./DatosProcesados"):
         for i in  archivos:
+           
             actividad=i.split('-')
             actividad=actividad[1]
+            
             os.chdir(directorioActual+"\DatosProcesados")
             dfX=pd.DataFrame()
             dfX = pd.read_csv(i, sep=';', index_col=0, error_bad_lines=False)
+           
+            os.chdir(directorioActual)
             numero=numeroActividad(actividad)
+           
             numeroFilas=len(dfX)
+            
             dfY=pd.DataFrame()
-            for i in range(numeroFilas):
-                dfY[i]=numero
-        dfOutX = pd.concat([dfOutX, dfX])
-        dfOutY = pd.concat([dfOutY, dfY])
+            lista=list()
+           
+           
+            i=0
+            for i in range(numeroFilas+1):
+                lista.append(numero)
+            dfY=pd.DataFrame(lista)
+          
+            dfOutX = pd.concat([dfOutX, dfX])
+            dfOutY = pd.concat([dfOutY, dfY])
      os.chdir(directorioActual)
-     dfOutX.to_csv("X_train.csv")
-     dfOutY.to_csv("y_train.csv")
+     dfOutX.to_csv("X_train.csv",header=None )
+     dfOutY.to_csv("y_train.csv",header=None )
             
 if __name__ == "__main__":
     juntar()
