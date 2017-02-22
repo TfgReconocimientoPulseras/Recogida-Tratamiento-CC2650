@@ -47,8 +47,8 @@ def juntar():
             lista=list()
            
            
-            i=0
-            for i in range(numeroFilas):
+            d=0
+            for d in range(numeroFilas):
                 lista.append(numero)
             dfY=pd.DataFrame(lista)
           
