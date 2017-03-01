@@ -16,7 +16,7 @@ def getStatisticsValues(nombre, numeroFicheros, time=1, overlap=500):
     dfOut = dfRollingMean.T.append(dfRollingMin.T).append(dfRollingMax.T)
     dfOut = dfOut.T    
     
-    for i in range(0, numeroFicheros):
+    for i in range(0, int(numeroFicheros)):
         df = pd.read_csv("Datos/%s-%d.csv" %(nombre, i+1), sep=';', index_col=0, error_bad_lines=False)
         dfConjunta = pd.DataFrame();
         df.index = pd.to_datetime(df.index.values, unit='ms')
