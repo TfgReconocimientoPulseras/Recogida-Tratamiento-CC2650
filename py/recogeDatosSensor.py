@@ -84,6 +84,14 @@ def obtener_datos_sensor(nombre, tiempo, mac, archivos, actividad):
                 nombre_actividad = "TROTAR"
             elif int(actividad) == 3:
                 nombre_actividad = "BARRER"
+            elif int(actividad) == 4:
+                nombre_actividad = "DEPIE"
+            elif int(actividad) == 5:
+                nombre_actividad = "SENTADO"
+            elif int(actividad) == 6:
+                nombre_actividad = "SUBIRESCALERAS"
+            elif int(actividad) == 7:
+                nombre_actividad = "BAJARESCALERAS"
             else:
                 print("Actividad no registrada en el sistema")
                 quit()
