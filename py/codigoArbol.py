@@ -33,7 +33,7 @@ def tree_to_code(tree, feature_names):
         if tree_.feature[node] != _tree.TREE_UNDEFINED:
             name = feature_name[node]
             threshold = tree_.threshold[node]
-            print "{}if({} <= {})".format(indent, name, threshold)
+            print "{}if((double)df.get(i, \"{}\") <= {})".format(indent, name, threshold)
             recurse(tree_.children_left[node], depth + 1)
             print "{}else //if({} > {})".format(indent, name, threshold)
             recurse(tree_.children_right[node], depth + 1)
